@@ -8,6 +8,13 @@
     <UseWPF>true</UseWPF>
   </PropertyGroup>
 
+  <!-- Exclude the test project sources from this WPF app build -->
+  <ItemGroup>
+    <Compile Remove="PokerGame.Tests\**\*.cs" />
+    <EmbeddedResource Remove="PokerGame.Tests\**\*" />
+    <None Remove="PokerGame.Tests\**\*" />
+  </ItemGroup>
+
   <ItemGroup>
     <Content Include="Assets\background.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

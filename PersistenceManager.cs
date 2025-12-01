@@ -14,17 +14,30 @@ namespace PokerGame
     {
         private readonly string _filePath;
 
-        public PersistenceManager()
+        public PersistenceManager(string? filePathOverride = null)
         {
+            if (!string.IsNullOrWhiteSpace(filePathOverride))
+            {
+                _filePath = filePathOverride;
+                EnsureDirectory(Path.GetDirectoryName(_filePath));
+                return;
+            }
+
             string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             string gameFolder = Path.Combine(appDataPath, "PokerGame");
             
-            if (!Directory.Exists(gameFolder))
-            {
-                Directory.CreateDirectory(gameFolder);
-            }
+            EnsureDirectory(gameFolder);
 
             _filePath = Path.Combine(gameFolder, "savegame.json");
+        }
+
+        private static void EnsureDirectory(string? folder)
+        {
+            if (string.IsNullOrWhiteSpace(folder)) return;
+            if (!Directory.Exists(folder))
+            {
+                Directory.CreateDirectory(folder);
+            }
         }
 
         public void Save(int credits)
