@@ -1,0 +1,24 @@
+# Build results
+bin/
+obj/
+
+# IDE configurations
+.vs/
+.idea/
+.vscode/
+
+# User-specific files
+*.user
+*.userosscache
+*.suo
+*.sln.docstates
+
+# Logs and generated data
+*.log
+/Assets/Sounds/*.wav
+
+# OS artifacts
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+*.DS_Store
