@@ -68,6 +68,10 @@ namespace PokerGame
                 _soundManager.PlayClick();
                 _viewModel.SelectedBet++;
                 if (_viewModel.SelectedBet > 5) _viewModel.SelectedBet = 1;
+                if (_viewModel.SelectedBet > _game.Credits)
+                {
+                    _viewModel.SelectedBet = Math.Max(1, Math.Min(5, _game.Credits));
+                }
                 RefreshUI();
             }
         }
@@ -77,7 +81,8 @@ namespace PokerGame
             if (_game.CurrentState == GameState.WaitingForBet && !_isAnimating)
             {
                 _soundManager.PlayClick();
-                _viewModel.SelectedBet = 5;
+                _viewModel.SelectedBet = Math.Min(5, _game.Credits);
+                if (_viewModel.SelectedBet < 1) _viewModel.SelectedBet = 1;
                 RefreshUI();
             }
         }
@@ -92,7 +97,9 @@ namespace PokerGame
 
                 if (_game.CurrentState == GameState.WaitingForBet)
                 {
-                    _game.PlaceBet(_viewModel.SelectedBet);
+                    var bet = Math.Max(1, Math.Min(_viewModel.SelectedBet, _game.Credits));
+                    _viewModel.SelectedBet = bet;
+                    _game.PlaceBet(bet);
 
                     // Animate Deal
                     _soundManager.PlayDeal();
@@ -265,10 +272,7 @@ namespace PokerGame
                         finally
                         {
                             _isAnimating = false;
-                            if (_game.CurrentState == GameState.GameOver)
-                            {
-                                RefreshUI();
-                            }
+                            RefreshUI();
                         }
                     }
                 }

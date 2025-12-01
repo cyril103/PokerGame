@@ -124,13 +124,7 @@ namespace PokerGame
             {
                 LastWin *= 2;
                 _bankroll.AddWin(LastWin / 2); // Add the other half (original win was already added)
-                // Wait for player to Collect or Double again. 
-                // We stay in DoubleUp state effectively, but UI needs to show result.
-                // Actually, let's keep state as DoubleUp so they can choose to double again or collect.
-                // But we need to reset the "round" for next double. 
-                // For simplicity, let's say one double attempt per "StartDoubleUp" call? 
-                // No, standard is recursive.
-                // Let's return true for Win.
+                CurrentState = GameState.GameOver; // Let UI offer Collect or Double again
                 return true;
             }
             else if (comparison < 0) // Player loses
@@ -143,6 +137,7 @@ namespace PokerGame
             else // Tie (Push)
             {
                 // Push: Player keeps money, can try again or collect.
+                CurrentState = GameState.GameOver;
                 return true; // Treated as "not lost"
             }
         }

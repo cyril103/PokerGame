@@ -133,8 +133,8 @@ namespace PokerGame
                     DealDrawLabel = "DRAW";
                     ShowBetControls = false;
                     ShowDealDrawButton = false;
-                    ShowDoubleButton = false;
-                    ShowCollectButton = false;
+                    ShowDoubleButton = game.LastWin > 0 && !isAnimating; // allow double again / collect after result
+                    ShowCollectButton = game.LastWin > 0 && !isAnimating;
                     IsBetEnabled = false;
                     IsDealDrawEnabled = false;
                     StatusText = "Pick a card higher than the Dealer's (Left)";
