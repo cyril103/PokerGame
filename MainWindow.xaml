@@ -8,6 +8,8 @@
     </Window.Background>
     
     <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
         <Style TargetType="Button">
             <Setter Property="Template">
                 <Setter.Value>
@@ -86,7 +88,7 @@
                 </TextBlock.Effect>
             </TextBlock>
             <Border Background="#88000000" CornerRadius="10" Padding="20,5" Margin="0,10,0,0" HorizontalAlignment="Center">
-                <TextBlock x:Name="StatusText" Text="Place your bet to start" Foreground="White" FontSize="28" HorizontalAlignment="Center" FontWeight="SemiBold"/>
+                <TextBlock x:Name="StatusText" Text="{Binding StatusText}" Foreground="{Binding StatusBrush}" FontSize="28" HorizontalAlignment="Center" FontWeight="SemiBold"/>
             </Border>
         </StackPanel>
 
@@ -111,7 +113,7 @@
                 <!-- Left: Info -->
                 <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="20,0">
                     <TextBlock Text="CREDITS" Foreground="#AAAAAA" FontSize="16"/>
-                    <TextBlock x:Name="CreditsText" Text="100" Foreground="#00FF00" FontSize="40" FontWeight="Bold">
+                    <TextBlock x:Name="CreditsText" Text="{Binding Credits}" Foreground="#00FF00" FontSize="40" FontWeight="Bold">
                         <TextBlock.Effect>
                             <DropShadowEffect Color="#00FF00" BlurRadius="10" ShadowDepth="0"/>
                         </TextBlock.Effect>
@@ -120,19 +122,35 @@
 
                 <!-- Center: Action Buttons -->
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button x:Name="BtnBetOne" Content="BET ONE" Width="120" Height="60" Margin="10" Click="BtnBetOne_Click"/>
-                    <Button x:Name="BtnBetMax" Content="BET MAX" Width="120" Height="60" Margin="10" Click="BtnBetMax_Click"/>
-                    <Button x:Name="BtnDealDraw" Content="DEAL" Width="160" Height="70" Margin="30,0" Click="BtnDealDraw_Click" Style="{StaticResource ActionButtonStyle}"/>
+                    <Button x:Name="BtnBetOne" Content="BET ONE" Width="120" Height="60" Margin="10"
+                            Command="{Binding BetOneCommand}"
+                            IsEnabled="{Binding IsBetEnabled}"
+                            Visibility="{Binding ShowBetControls, Converter={StaticResource BoolToVis}}"/>
+                    <Button x:Name="BtnBetMax" Content="BET MAX" Width="120" Height="60" Margin="10"
+                            Command="{Binding BetMaxCommand}"
+                            IsEnabled="{Binding IsBetEnabled}"
+                            Visibility="{Binding ShowBetControls, Converter={StaticResource BoolToVis}}"/>
+                    <Button x:Name="BtnDealDraw" Content="{Binding DealDrawLabel}" Width="160" Height="70" Margin="30,0"
+                            Command="{Binding DealDrawCommand}"
+                            IsEnabled="{Binding IsDealDrawEnabled}"
+                            Visibility="{Binding ShowDealDrawButton, Converter={StaticResource BoolToVis}}"
+                            Style="{StaticResource ActionButtonStyle}"/>
                     
                     <!-- Double Up Controls -->
-                    <Button x:Name="BtnDouble" Content="DOUBLE" Width="120" Height="60" Margin="10" Click="BtnDouble_Click" Visibility="Collapsed" Background="#FF4500"/>
-                    <Button x:Name="BtnCollect" Content="COLLECT" Width="120" Height="60" Margin="10" Click="BtnCollect_Click" Visibility="Collapsed" Background="#228B22"/>
+                    <Button x:Name="BtnDouble" Content="DOUBLE" Width="120" Height="60" Margin="10"
+                            Command="{Binding DoubleCommand}"
+                            Visibility="{Binding ShowDoubleButton, Converter={StaticResource BoolToVis}}"
+                            Background="#FF4500"/>
+                    <Button x:Name="BtnCollect" Content="COLLECT" Width="120" Height="60" Margin="10"
+                            Command="{Binding CollectCommand}"
+                            Visibility="{Binding ShowCollectButton, Converter={StaticResource BoolToVis}}"
+                            Background="#228B22"/>
                 </StackPanel>
 
                 <!-- Right: Bet Info -->
                 <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="20,0">
                     <TextBlock Text="BET" Foreground="#AAAAAA" FontSize="16" HorizontalAlignment="Right"/>
-                    <TextBlock x:Name="BetText" Text="1" Foreground="Yellow" FontSize="40" FontWeight="Bold" HorizontalAlignment="Right">
+                    <TextBlock x:Name="BetText" Text="{Binding SelectedBet}" Foreground="Yellow" FontSize="40" FontWeight="Bold" HorizontalAlignment="Right">
                          <TextBlock.Effect>
                             <DropShadowEffect Color="Yellow" BlurRadius="10" ShadowDepth="0"/>
                         </TextBlock.Effect>

@@ -10,27 +10,36 @@ namespace PokerGame
     public partial class MainWindow : Window
     {
         private VideoPokerGame _game;
-        private int _selectedBet = 1;
         private List<CardControl> _cardControls;
         private bool _isAnimating = false;
         private SoundManager _soundManager;
         private PersistenceManager _persistenceManager;
+        private MainViewModel _viewModel;
 
         public MainWindow()
         {
             InitializeComponent();
             _persistenceManager = new PersistenceManager();
             var saveData = _persistenceManager.Load();
-            
+
             _game = new VideoPokerGame(saveData.Credits);
             _soundManager = new SoundManager();
             _cardControls = new List<CardControl> { Card1, Card2, Card3, Card4, Card5 };
-            
+
+            _viewModel = new MainViewModel(
+                BetOneAction,
+                BetMaxAction,
+                DealDrawAsync,
+                DoubleAsync,
+                CollectAction);
+
+            DataContext = _viewModel;
+
             // Initialize cards face down
             foreach(var card in _cardControls) card.ShowBack();
-            
-            UpdateUI();
-            
+
+            RefreshUI();
+
             this.Closing += MainWindow_Closing;
         }
 
@@ -39,120 +48,55 @@ namespace PokerGame
             _persistenceManager.Save(_game.Credits);
         }
 
-        private void UpdateUI()
+        private void RefreshUI()
         {
-            CreditsText.Text = _game.Credits.ToString();
-            BetText.Text = _selectedBet.ToString();
+            _viewModel.UpdateFromGame(_game, _isAnimating);
 
-            if (_game.CurrentState == GameState.WaitingForBet)
+            if (_game.CurrentState == GameState.Dealt)
             {
-                BtnDealDraw.Content = "DEAL";
-                StatusText.Text = "Place your bet!";
-                BtnBetOne.IsEnabled = !_isAnimating;
-                BtnBetMax.IsEnabled = !_isAnimating;
-                BtnDealDraw.IsEnabled = !_isAnimating;
-                
-                BtnDouble.Visibility = Visibility.Collapsed;
-                BtnCollect.Visibility = Visibility.Collapsed;
-                BtnBetOne.Visibility = Visibility.Visible;
-                BtnBetMax.Visibility = Visibility.Visible;
-                BtnDealDraw.Visibility = Visibility.Visible;
-            }
-            else if (_game.CurrentState == GameState.DoubleUp)
-            {
-                BtnDealDraw.Visibility = Visibility.Collapsed;
-                BtnBetOne.Visibility = Visibility.Collapsed;
-                BtnBetMax.Visibility = Visibility.Collapsed;
-                
-                BtnDouble.Visibility = Visibility.Collapsed; 
-                BtnCollect.Visibility = Visibility.Collapsed; 
-                
-                StatusText.Text = "Pick a card higher than the Dealer's (Left)";
-            }
-            else if (_game.CurrentState == GameState.Dealt)
-            {
-                BtnDealDraw.Content = "DRAW";
-                StatusText.Text = "Select cards to hold...";
-                BtnBetOne.IsEnabled = false;
-                BtnBetMax.IsEnabled = false;
-                BtnDealDraw.IsEnabled = !_isAnimating;
-                
-                // Update hold status only (cards are updated via animation)
                 for (int i = 0; i < 5; i++)
                 {
                     _cardControls[i].SetHeld(_game.HeldCards[i]);
                 }
             }
-            else if (_game.CurrentState == GameState.GameOver)
-            {
-                BtnDealDraw.Content = "NEW GAME";
-                BtnBetOne.IsEnabled = false;
-                BtnBetMax.IsEnabled = false;
-                BtnDealDraw.IsEnabled = !_isAnimating;
-                
-                BtnBetOne.Visibility = Visibility.Visible;
-                BtnBetMax.Visibility = Visibility.Visible;
-                BtnDealDraw.Visibility = Visibility.Visible;
-
-                if (_game.LastWin > 0)
-                {
-                    StatusText.Text = $"{_game.LastHandRank} - YOU WIN {_game.LastWin}!";
-                    StatusText.Foreground = Brushes.Yellow;
-                    
-                    // Show Double/Collect options if we won
-                    BtnDouble.Visibility = Visibility.Visible;
-                    BtnCollect.Visibility = Visibility.Visible;
-                    BtnDealDraw.Visibility = Visibility.Collapsed;
-                    BtnBetOne.Visibility = Visibility.Collapsed;
-                    BtnBetMax.Visibility = Visibility.Collapsed;
-                }
-                else
-                {
-                    StatusText.Text = "Game Over";
-                    StatusText.Foreground = Brushes.White;
-                    BtnDouble.Visibility = Visibility.Collapsed;
-                    BtnCollect.Visibility = Visibility.Collapsed;
-                }
-            }
         }
 
-        private void BtnBetOne_Click(object sender, RoutedEventArgs e)
+        private void BetOneAction()
         {
             if (_game.CurrentState == GameState.WaitingForBet && !_isAnimating)
             {
                 _soundManager.PlayClick();
-                _selectedBet++;
-                if (_selectedBet > 5) _selectedBet = 1;
-                UpdateUI();
+                _viewModel.SelectedBet++;
+                if (_viewModel.SelectedBet > 5) _viewModel.SelectedBet = 1;
+                RefreshUI();
             }
         }
 
-        private void BtnBetMax_Click(object sender, RoutedEventArgs e)
+        private void BetMaxAction()
         {
             if (_game.CurrentState == GameState.WaitingForBet && !_isAnimating)
             {
                 _soundManager.PlayClick();
-                _selectedBet = 5;
-                UpdateUI();
+                _viewModel.SelectedBet = 5;
+                RefreshUI();
             }
         }
 
-        private async void BtnDealDraw_Click(object sender, RoutedEventArgs e)
+        private async Task DealDrawAsync()
         {
             if (_isAnimating) return;
-
             try
             {
                 _isAnimating = true;
-                UpdateUI(); // Disable buttons
+                RefreshUI(); // Disable buttons
 
                 if (_game.CurrentState == GameState.WaitingForBet)
                 {
-                    _game.PlaceBet(_selectedBet);
-                    
+                    _game.PlaceBet(_viewModel.SelectedBet);
+
                     // Animate Deal
                     _soundManager.PlayDeal();
-                    StatusText.Text = "Dealing...";
+                    _viewModel.SetStatus("Dealing...");
                     for (int i = 0; i < 5; i++)
                     {
                         await _cardControls[i].FlipTo(_game.CurrentHand[i]);
@@ -162,14 +106,13 @@ namespace PokerGame
                 else if (_game.CurrentState == GameState.Dealt)
                 {
                     // Capture old hand to know which ones changed
-                    var oldHand = new List<Card>(_game.CurrentHand);
                     var oldHeld = new List<bool>(_game.HeldCards);
                     
                     _game.Draw();
 
                     // Animate Draw (only replaced cards)
                     _soundManager.PlayDeal();
-                    StatusText.Text = "Drawing...";
+                    _viewModel.SetStatus("Drawing...");
                     
                     // Clear "HELD" overlay immediately for held cards so they are visible ("en clair")
                     for (int i = 0; i < 5; i++)
@@ -212,9 +155,6 @@ namespace PokerGame
                 else if (_game.CurrentState == GameState.GameOver)
                 {
                     _game.Reset();
-                    // Flip all back to face down for new game feel?
-                    // Or just leave them and flip new ones on deal.
-                    // Let's flip them face down for effect.
                     foreach(var card in _cardControls)
                     {
                          card.ShowBack();
@@ -230,17 +170,17 @@ namespace PokerGame
             finally
             {
                 _isAnimating = false;
-                UpdateUI();
+                RefreshUI();
             }
         }
 
-        private async void BtnDouble_Click(object sender, RoutedEventArgs e)
+        private async Task DoubleAsync()
         {
             if (_isAnimating) return;
             try
             {
                 _game.StartDoubleUp();
-                UpdateUI();
+                RefreshUI();
                 
                 // Show Dealer Card (Index 0)
                 await _cardControls[0].FlipTo(_game.CurrentHand[0]);
@@ -258,14 +198,14 @@ namespace PokerGame
             }
         }
 
-        private void BtnCollect_Click(object sender, RoutedEventArgs e)
+        private void CollectAction()
         {
              if (_isAnimating) return;
              try
              {
                  _soundManager.PlayClick();
                  _game.Collect();
-                 UpdateUI();
+                 RefreshUI();
              }
              catch (Exception ex)
              {
@@ -285,7 +225,7 @@ namespace PokerGame
                     {
                         _soundManager.PlayClick();
                         _game.ToggleHold(index);
-                        UpdateUI();
+                        RefreshUI();
                     }
                 }
             }
@@ -308,15 +248,13 @@ namespace PokerGame
                             if (win)
                             {
                                 _soundManager.PlayWin(HandRank.HighCard); // Simple win sound
-                                StatusText.Text = $"YOU WIN! Total: {_game.LastWin}";
-                                BtnDouble.Visibility = Visibility.Visible;
-                                BtnCollect.Visibility = Visibility.Visible;
+                                _viewModel.SetStatus($"YOU WIN! Total: {_game.LastWin}", Brushes.Yellow);
                                 cardControl.SetWinning(true); // Highlight the winning card
                             }
                             else
                             {
                                 _soundManager.PlayGameOver();
-                                StatusText.Text = "YOU LOSE";
+                                _viewModel.SetStatus("YOU LOSE");
                                 await Task.Delay(1000);
                             }
                         }
@@ -329,7 +267,7 @@ namespace PokerGame
                             _isAnimating = false;
                             if (_game.CurrentState == GameState.GameOver)
                             {
-                                UpdateUI();
+                                RefreshUI();
                             }
                         }
                     }
