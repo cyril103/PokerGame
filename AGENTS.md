@@ -4,14 +4,14 @@
 **Project Name**: Video Poker (Jacks or Better)
 **Framework**: .NET 8.0 (C#)
 **UI Framework**: WPF (Windows Presentation Foundation)
-**Current State**: Functional "Jacks or Better" game with sound, visual effects, and Double Up feature.
+**Current State**: Functional "Jacks or Better" game with sound, visual effects, Double Up, bankroll persistence, and automatic top-up after bust.
 
 ## Architecture Overview
 The project follows a separation of concerns, though currently implemented with Code-Behind (not full MVVM yet).
 
 ### Core Logic (No UI dependencies)
 - **`Card.cs`**: Represents a playing card (Rank, Suit). Implements `IComparable`.
-- **`Deck.cs`**: Manages the deck. Uses `RandomNumberGenerator` (CSPRNG) for secure shuffling.
+- **`Deck.cs`**: Manages the deck. Uses `RandomNumberGenerator.GetInt32` (CSPRNG) for unbiased Fisher-Yates shuffling.
 - **`HandEvaluator.cs`**: Static class to evaluate poker hands (Royal Flush, Straight, etc.) and identify winning cards.
 - **`VideoPokerGame.cs`**: Main game controller / State Machine (`WaitingForBet` -> `Dealt` -> `DoubleUp` -> `GameOver`).
 - **`Bankroll.cs`**: Manages player credits.
@@ -22,21 +22,22 @@ The project follows a separation of concerns, though currently implemented with 
 - **`CardControl.xaml` / `.cs`**: UserControl for displaying cards. Handles animations (Flip, Win Glow) and "Held" status.
 
 ## Key Implementation Details
-- **RNG**: We use `System.Security.Cryptography.RandomNumberGenerator` for the shuffle to ensure fairness. Do not replace with `System.Random`.
+- **RNG**: We use `System.Security.Cryptography.RandomNumberGenerator.GetInt32` for the shuffle to ensure fairness. Do not replace with `System.Random`.
 - **Animations**: Card flips and glows are done via WPF `Storyboard` in `CardControl`.
 - **Audio**: `SoundManager` looks for .wav files in `Assets/Sounds`. If missing, it uses `Console.Beep` on a background thread.
+- **Persistence**: `PersistenceManager` saves bankroll to `%LocalAppData%/PokerGame/savegame.json`; loads defaults if missing/corrupt or credits <= 0. `VideoPokerGame.Reset` auto-deposits 100 credits if bankroll is empty to avoid lockout.
 
 ## Current Backlog & Next Steps
-If you are picking up this project, here are the immediate priorities (derived from `GEMINI.md`):
+If you are picking up this project, here are the immediate priorities:
 
-1.  **Persistence (High Priority)**:
-    - Implement saving/loading of `Bankroll` and game state to a local file (JSON/SQLite) so credits are preserved between sessions.
-2.  **Statistics**:
+1.  **Statistics**:
     - Add a new Window/View to show stats: Hands played, Win rate, RTP, Best win.
+2.  **UX/Gameplay**:
+    - Improve Double Up UX (clear loop for double-again/collect, show amount in play) and enforce bet controls when credits are low.
 3.  **Visual Polish**:
     - Replace vector card rendering with high-quality sprite assets.
-4.  **Refactoring**:
-    - Migrate `Tests.cs` to a proper xUnit test project.
+4.  **Refactoring/Tests**:
+    - Migrate `Tests.cs` to a proper xUnit test project with coverage for hand evaluation, payouts, persistence, and double-up flows.
     - Consider refactoring `MainWindow` to MVVM pattern if complexity grows.
 
 ## How to Run
