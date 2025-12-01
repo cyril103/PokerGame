@@ -49,7 +49,15 @@ namespace PokerGame
             try
             {
                 string json = File.ReadAllText(_filePath);
-                return JsonSerializer.Deserialize<SaveData>(json);
+                var data = JsonSerializer.Deserialize<SaveData>(json);
+                
+                // Guard against null or invalid data
+                if (data == null || data.Credits <= 0)
+                {
+                    return new SaveData { Credits = 100, LastPlayed = DateTime.Now };
+                }
+
+                return data;
             }
             catch
             {

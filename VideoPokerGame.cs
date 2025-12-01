@@ -96,18 +96,13 @@ namespace PokerGame
 
         public void StartDoubleUp()
         {
-            if (CurrentState != GameState.GameOver || LastWin <= 0)
+            if (LastWin <= 0)
                 throw new InvalidOperationException("Cannot double up now.");
 
-            _deck.Reset();
-            _deck.Shuffle();
-            
-            // Deal 5 cards: 1st is Dealer's (Face Up), others are Player's options (Face Down)
-            CurrentHand = _deck.DealCards(5);
-            
-            // In UI, we will show Card 0 face up, others face down.
-            // Logic doesn't need to know about face up/down, just that we are in DoubleUp state.
-            
+            if (CurrentState != GameState.GameOver && CurrentState != GameState.DoubleUp)
+                throw new InvalidOperationException("Double up not available.");
+
+            PrepareDoubleUpRound();
             CurrentState = GameState.DoubleUp;
         }
 
@@ -210,6 +205,22 @@ namespace PokerGame
             CurrentState = GameState.WaitingForBet;
             CurrentHand.Clear();
             HeldCards.Clear();
+            
+            // Auto top-up so player can keep playing after bust
+            if (_bankroll.Credits <= 0)
+            {
+                _bankroll.Deposit(100);
+            }
+        }
+
+        private void PrepareDoubleUpRound()
+        {
+            _deck.Reset();
+            _deck.Shuffle();
+
+            // Deal 5 cards: 1st is Dealer's (Face Up), others are Player's options (Face Down)
+            CurrentHand = _deck.DealCards(5);
+            HeldCards = new List<bool> { false, false, false, false, false };
         }
     }
 }

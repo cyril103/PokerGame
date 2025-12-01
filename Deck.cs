@@ -35,27 +35,16 @@ namespace PokerGame
         /// </summary>
         public void Shuffle()
         {
-            // Use RNGCryptoServiceProvider or RandomNumberGenerator for cryptographic strength randomness
-            using (var rng = RandomNumberGenerator.Create())
+            // Use CSPRNG for a fair Fisher-Yates shuffle
+            int n = _cards.Count;
+            while (n > 1)
             {
-                int n = _cards.Count;
-                while (n > 1)
-                {
-                    byte[] box = new byte[1];
-                    do
-                    {
-                        rng.GetBytes(box);
-                    }
-                    while (!(box[0] < n * (Byte.MaxValue / n))); // Fair distribution check
+                int k = RandomNumberGenerator.GetInt32(n); // Uniform 0..n-1
+                n--;
 
-                    int k = (box[0] % n);
-                    n--;
-                    
-                    // Swap cards
-                    Card value = _cards[k];
-                    _cards[k] = _cards[n];
-                    _cards[n] = value;
-                }
+                Card value = _cards[k];
+                _cards[k] = _cards[n];
+                _cards[n] = value;
             }
         }
 
