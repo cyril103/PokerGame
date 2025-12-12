@@ -1,44 +1,46 @@
 # Analyse du Projet PokerGame
 
 ## Vue d'ensemble
-Application WPF (.NET 8) de Video Poker "Jacks or Better". Logique de jeu isolée de l'UI; Double Up, sons, animations, persistance de bankroll et MVVM léger (MainViewModel/RelayCommand) sont en place. Projet de tests xUnit ajouté.
+Application WPF (.NET 8) de Video Poker multi-variantes ("Jacks or Better" et "Deuces Wild"). Architecture MVVM avec navigation, logique de jeu polymorphique, Double Up, sons, animations et persistance de bankroll.
 
 ## Architecture et Structure
 ### Logique métier (Core)
-- `Card.cs` / `Deck.cs` : Modélisent les cartes et le paquet. Mélange via Fisher-Yates avec `RandomNumberGenerator.GetInt32` (CSPRNG).
-- `HandEvaluator.cs` : Détermine le rang de main et retourne les cartes gagnantes.
-- `VideoPokerGame.cs` : Machine d'états (`WaitingForBet`, `Dealt`, `DoubleUp`, `GameOver`), gestion des mises, calcul des gains, boucle de Double Up, auto top-up à 100 crédits si la bankroll tombe à 0.
-- `Bankroll.cs` : Solde du joueur, validation des mises.
-- `PersistenceManager.cs` : Sauvegarde JSON dans `%LocalAppData%/PokerGame/savegame.json` (retourne 100 crédits par défaut si fichier absent/corrompu ou crédits <= 0).
-- `SoundManager.cs` : Lecture des WAV avec fallback `Console.Beep`.
+- `IGameVariant.cs` : Interface définissant les règles spécifiques (évaluation, payouts, cartes gagnantes).
+- `JacksOrBetterVariant.cs` / `DeucesWildVariant.cs` : Implémentations des variantes. Deuces Wild utilise la paytable "Not So Ugly Ducks" (NSUD).
+- `VideoPokerGame.cs` : Moteur de jeu agnostique, délègue la logique spécifique à `IGameVariant`.
+- `HandEvaluator.cs` : Logique d'évaluation de base (étendue pour supporter les jokers/wilds).
+- `Card.cs` / `Deck.cs` : Modèle de cartes et RNG (CSPRNG).
+- `Bankroll.cs` / `PersistenceManager.cs` : Gestion et sauvegarde des crédits (`%LocalAppData%/PokerGame/savegame.json`).
 
-- `MainWindow.xaml` / `.cs` : Interactions Deal/Draw/Hold/Double/Collect, animations séquentielles, bindings via MainViewModel.
-- `MainViewModel.cs` / `RelayCommand.cs` : Expose l'état (crédits, mise, statut, visibilités) et les commandes (Bet One/Max, Deal/Draw, Double, Collect).
-- `CardControl.xaml` / `.cs` : Rendu des cartes, flip animation, surbrillance des cartes gagnantes, overlay HELD.
+### UI / MVVM
+- `ShellViewModel.cs` : ViewModel principal gérant la navigation (CurrentViewModel).
+- `GameSelectionViewModel.cs` : Écran de choix du jeu.
+- `VideoPokerViewModel.cs` : ViewModel du jeu (anciennement MainViewModel), gère l'état de la partie et les commandes.
+- `ViewModelBase.cs` : Classe de base implémentant `INotifyPropertyChanged`.
+- `MainWindow.xaml` : Fenêtre unique utilisant un `ContentControl` et des `DataTemplate` pour changer de vue.
+- `CardControl.xaml` : Affichage des cartes avec animations (Flip) et états (Held, Winning).
 
 ## État actuel
-- Jeu jouable avec paytable 9/6, bonus Royal Flush max bet (4000).
-- Double Up fonctionnel (re-deal à chaque tentative) ; Collect ou double again supportés.
-- Persistance de la bankroll entre sessions, remise à 100 crédits en cas de fichier invalide ou de bust. Chemin de sauvegarde surchargeable pour tests.
-- RNG non biaisé via `RandomNumberGenerator.GetInt32`.
-- MVVM léger pour la fenêtre principale (bindings sur libellés, visibilités, commandes).
-- Projet xUnit `PokerGame.Tests` (net8.0-windows) couvrant évaluation des mains, cartes gagnantes, payouts, persistance et auto top-up.
+- **Variantes** : Jacks or Better (9/6) et Deuces Wild (NSUD).
+- **Navigation** : Écran d'accueil pour choisir le jeu, bouton "MENU" en jeu pour revenir.
+- **Gameplay** : Double Up, Auto-Hold (à implémenter plus intelligemment), mise 1-5 crédits.
+- **Visuel** : Animations de distribution, retournement des cartes, surbrillance précise des cartes gagnantes.
+- **Tests** : Couverture xUnit pour les deux variantes (`PokerGame.Tests`).
 
 ## Points techniques récents
-- Correction biais shuffle (rejet byte supprimé, usage GetInt32).
-- Robustesse persistance (fallback si save null/<=0).
-- Anti-lockout : auto-dépôt 100 crédits dans `Reset`.
-- Couche MVVM ajoutée (MainViewModel/RelayCommand, bindings boutons/labels).
-- Suite de tests xUnit créée (hand eval, payouts, persistance, top-up).
+- **Refactoring Polymorphique** : Introduction de `IGameVariant` pour supporter plusieurs jeux sans dupliquer le moteur.
+- **Navigation MVVM** : Mise en place de `ShellViewModel` pour passer du menu au jeu sans redémarrer.
+- **Deuces Wild** : Implémentation complète avec gestion des 2 comme Wilds, nouvelles mains (Four Deuces, Wild Royal) et paytable ajustée.
+- **Correctifs** : Affichage initial des dos de cartes, correction du bug de redémarrage (réinitialisation des contrôles).
 
 ## Backlog priorisé
-1) Statistiques : fenêtre dédiée (mains jouées, win rate, RTP, plus gros gain) et éventuellement historique succinct.
-2) UX/Gameplay : sécuriser les boutons de mise quand crédits insuffisants, clarifier la boucle Double Up (afficher montant en jeu, bouton "double again").
-3) Habillage visuel : sprites haute qualité pour les cartes, polish animations.
-4) Tests/qualité : étendre xUnit (Double Up avec deck contrôlé, paytable complet, persistance atomique), ajouter CI.
-5) Architecture : continuer la montée en MVVM (bindings complets pour l'état de jeu et les commandes, refactor des événements restants si nécessaire).
+1) **Statistiques** : Fenêtre dédiée (mains jouées, win rate, RTP par variante).
+2) **Stratégie Auto-Hold** : Suggérer les meilleures cartes à garder (Trainer mode).
+3) **UX/Polish** : Améliorer les assets graphiques (sprites cartes), sons plus variés.
+4) **Plus de variantes** : Joker Poker, Bonus Poker, etc.
+5) **CI/CD** : Pipeline de build et tests automatisés.
 
 ## Comment lancer
 - `dotnet run` depuis la racine.
-- `dotnet test PokerGame.Tests/PokerGame.Tests.csproj` pour lancer les tests.
-- Actifs audio attendus sous `bin/Debug/net8.0-windows/Assets/Sounds/`.
+- `dotnet test` pour lancer la suite de tests (incluant les règles Deuces Wild).
+
