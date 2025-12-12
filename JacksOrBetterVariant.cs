@@ -57,5 +57,10 @@ namespace PokerGame
             }
             return bet * multiplier;
         }
+
+        public bool IsCardWild(Card card)
+        {
+            return false;
+        }
     }
 }

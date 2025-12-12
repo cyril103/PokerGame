@@ -299,5 +299,10 @@ namespace PokerGame
 
             return hand; // Fallback
         }
+
+        public bool IsCardWild(Card card)
+        {
+            return card.Rank == Rank.Two;
+        }
     }
 }

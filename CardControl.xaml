@@ -54,6 +54,15 @@
                 <!-- Center Suit -->
                 <TextBlock x:Name="CenterSuit" Text="♠" FontSize="80" HorizontalAlignment="Center" VerticalAlignment="Center"/>
 
+                <!-- Wild Label -->
+                <TextBlock x:Name="WildLabel" Text="WILD" Foreground="#FFD700" FontSize="24" FontWeight="Bold" 
+                           HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,40,0,0" 
+                           Visibility="Collapsed">
+                    <TextBlock.Effect>
+                        <DropShadowEffect Color="Black" BlurRadius="2" ShadowDepth="1"/>
+                    </TextBlock.Effect>
+                </TextBlock>
+
                 <!-- Bottom Right Rank/Suit (Rotated) -->
                 <StackPanel HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="8" RenderTransformOrigin="0.5,0.5">
                     <StackPanel.RenderTransform>

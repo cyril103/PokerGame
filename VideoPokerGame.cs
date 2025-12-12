@@ -159,6 +159,11 @@ namespace PokerGame
             return _variant.GetWinningCards(CurrentHand, LastHandRank);
         }
 
+        public bool IsCardWild(Card card)
+        {
+            return _variant.IsCardWild(card);
+        }
+
         public void Reset()
         {
             CurrentState = GameState.WaitingForBet;

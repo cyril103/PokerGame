@@ -14,9 +14,9 @@ namespace PokerGame
             InitializeComponent();
         }
 
-        public void SetCard(Card card, bool faceUp = true)
+        public void SetCard(Card card, bool faceUp = true, bool isWild = false)
         {
-            UpdateCardVisuals(card);
+            UpdateCardVisuals(card, isWild);
             if (faceUp)
             {
                 CardFront.Visibility = Visibility.Visible;
@@ -29,7 +29,7 @@ namespace PokerGame
             }
         }
 
-        public async Task FlipTo(Card card)
+        public async Task FlipTo(Card card, bool isWild = false)
         {
             Storyboard close = (Storyboard)Resources["FlipClose"];
             Storyboard open = (Storyboard)Resources["FlipOpen"];
@@ -47,7 +47,7 @@ namespace PokerGame
             await tcs.Task;
 
             // Change Content
-            UpdateCardVisuals(card);
+            UpdateCardVisuals(card, isWild);
             CardFront.Visibility = Visibility.Visible;
             CardBack.Visibility = Visibility.Collapsed;
             HeldOverlay.Visibility = Visibility.Collapsed; // Reset held status on flip
@@ -57,7 +57,7 @@ namespace PokerGame
             open.Begin();
         }
 
-        private void UpdateCardVisuals(Card card)
+        private void UpdateCardVisuals(Card card, bool isWild = false)
         {
             if (card == null) return;
 
@@ -91,6 +91,8 @@ namespace PokerGame
             TopSuit.Foreground = color;
             BottomSuit.Foreground = color;
             CenterSuit.Foreground = color;
+
+            WildLabel.Visibility = isWild ? Visibility.Visible : Visibility.Collapsed;
         }
 
         public void SetHeld(bool isHeld)

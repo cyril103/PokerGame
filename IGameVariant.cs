@@ -8,5 +8,6 @@ namespace PokerGame
         HandRank EvaluateHand(List<Card> hand);
         int CalculatePayout(HandRank rank, int bet);
         List<Card> GetWinningCards(List<Card> hand, HandRank rank);
+        bool IsCardWild(Card card);
     }
 }

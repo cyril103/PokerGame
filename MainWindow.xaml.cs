@@ -182,7 +182,8 @@ namespace PokerGame
                     _gameViewModel.SetStatus("Dealing...");
                     for (int i = 0; i < 5; i++)
                     {
-                        await _cardControls[i].FlipTo(_game.CurrentHand[i]);
+                        var card = _game.CurrentHand[i];
+                        await _cardControls[i].FlipTo(card, _game.IsCardWild(card));
                         await Task.Delay(100); // Stagger effect
                     }
                 }
@@ -210,7 +211,8 @@ namespace PokerGame
                     {
                         if (!oldHeld[i])
                         {
-                            await _cardControls[i].FlipTo(_game.CurrentHand[i]);
+                            var card = _game.CurrentHand[i];
+                            await _cardControls[i].FlipTo(card, _game.IsCardWild(card));
                             await Task.Delay(100);
                         }
                     }
@@ -268,7 +270,8 @@ namespace PokerGame
                 RefreshUI();
                 
                 // Show Dealer Card (Index 0)
-                await _cardControls[0].FlipTo(_game.CurrentHand[0]);
+                var dealerCard = _game.CurrentHand[0];
+                await _cardControls[0].FlipTo(dealerCard, _game.IsCardWild(dealerCard));
                 
                 // Show Backs for others
                 for (int i = 1; i < 5; i++)
@@ -331,7 +334,8 @@ namespace PokerGame
                             bool win = _game.PlayDoubleUp(index);
                             
                             // Reveal card
-                            await cardControl.FlipTo(_game.CurrentHand[index]);
+                            var card = _game.CurrentHand[index];
+                            await cardControl.FlipTo(card, _game.IsCardWild(card));
                             
                             if (win)
                             {
