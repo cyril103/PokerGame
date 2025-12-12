@@ -27,7 +27,8 @@ namespace PokerGame
             // Start with Game Selection
             var selectionVM = new GameSelectionViewModel(
                 () => StartGame(new JacksOrBetterVariant()),
-                () => StartGame(new DeucesWildVariant())
+                () => StartGame(new DeucesWildVariant()),
+                () => this.Close()
             );
 
             _shellViewModel = new ShellViewModel(selectionVM, () => 
