@@ -13,6 +13,7 @@ namespace PokerGame
         private readonly RelayCommand _dealDrawCommand;
         private readonly RelayCommand _doubleCommand;
         private readonly RelayCommand _collectCommand;
+        private readonly RelayCommand _returnToMenuCommand;
 
         private int _credits;
         private int _selectedBet = 1;
@@ -31,13 +32,15 @@ namespace PokerGame
             System.Action betMaxAction,
             System.Func<Task> dealDrawAction,
             System.Func<Task> doubleAction,
-            System.Action collectAction)
+            System.Action collectAction,
+            System.Action returnToMenuAction)
         {
             _betOneCommand = new RelayCommand(_ => betOneAction(), _ => IsBetEnabled);
             _betMaxCommand = new RelayCommand(_ => betMaxAction(), _ => IsBetEnabled);
             _dealDrawCommand = new RelayCommand(async _ => await dealDrawAction(), _ => IsDealDrawEnabled && ShowDealDrawButton);
             _doubleCommand = new RelayCommand(async _ => await doubleAction(), _ => ShowDoubleButton);
             _collectCommand = new RelayCommand(_ => collectAction(), _ => ShowCollectButton);
+            _returnToMenuCommand = new RelayCommand(_ => returnToMenuAction());
         }
 
         public int Credits
@@ -111,6 +114,7 @@ namespace PokerGame
         public RelayCommand DealDrawCommand => _dealDrawCommand;
         public RelayCommand DoubleCommand => _doubleCommand;
         public RelayCommand CollectCommand => _collectCommand;
+        public RelayCommand ReturnToMenuCommand => _returnToMenuCommand;
 
         public void UpdateFromGame(VideoPokerGame game, bool isAnimating)
         {

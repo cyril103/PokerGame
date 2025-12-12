@@ -45,6 +45,7 @@ namespace PokerGame
         {
             var saveData = _persistenceManager.Load();
             _game = new VideoPokerGame(variant, saveData.Credits);
+            _cardControls = null; // Force re-discovery of controls for the new view
             
             // Re-initialize card controls list when the view is loaded?
             // The CardControls are inside the DataTemplate, so they are not accessible via 'this.Card1' anymore.
@@ -57,7 +58,8 @@ namespace PokerGame
                 BetMaxAction,
                 DealDrawAsync,
                 DoubleAsync,
-                CollectAction);
+                CollectAction,
+                () => _shellViewModel.ReturnToMenuCommand.Execute(null));
             
             _gameViewModel.UpdateFromGame(_game, _isAnimating);
             
