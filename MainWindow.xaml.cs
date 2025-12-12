@@ -264,11 +264,12 @@ namespace PokerGame
         private async Task DoubleAsync()
         {
             if (_isAnimating) return;
+            _isAnimating = true;
             EnsureCardControls();
             try
             {
                 _game.StartDoubleUp();
-                RefreshUI();
+                RefreshUI(); // Disable buttons while revealing dealer card
                 
                 // Show Dealer Card (Index 0)
                 var dealerCard = _game.CurrentHand[0];
@@ -285,6 +286,11 @@ namespace PokerGame
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+            }
+            finally
+            {
+                _isAnimating = false;
+                RefreshUI();
             }
         }
 

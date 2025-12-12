@@ -111,5 +111,39 @@ namespace PokerGame.Tests
             var rank = _variant.EvaluateHand(hand);
             Assert.Equal(HandRank.StraightFlush, rank);
         }
+
+        [Fact]
+        public void WildStraight_NotEnoughDeuces_ShouldNotCount()
+        {
+            // Non-deuces: 3, 7, 9. With 2 deuces, gaps are too large for a 5-long straight.
+            var hand = new List<Card>
+            {
+                new Card(Suit.Hearts, Rank.Two),
+                new Card(Suit.Spades, Rank.Two),
+                new Card(Suit.Clubs, Rank.Three),
+                new Card(Suit.Diamonds, Rank.Seven),
+                new Card(Suit.Hearts, Rank.Nine)
+            };
+
+            var rank = _variant.EvaluateHand(hand);
+            Assert.Equal(HandRank.HighCard, rank);
+        }
+
+        [Fact]
+        public void WildStraight_WithEnoughDeuces_ShouldCount()
+        {
+            // Non-deuces: 3,4,7. Two deuces can fill 5 and 6 for a straight.
+            var hand = new List<Card>
+            {
+                new Card(Suit.Hearts, Rank.Two),
+                new Card(Suit.Spades, Rank.Two),
+                new Card(Suit.Clubs, Rank.Three),
+                new Card(Suit.Diamonds, Rank.Four),
+                new Card(Suit.Hearts, Rank.Seven)
+            };
+
+            var rank = _variant.EvaluateHand(hand);
+            Assert.Equal(HandRank.Straight, rank);
+        }
     }
 }

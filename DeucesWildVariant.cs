@@ -145,10 +145,14 @@ namespace PokerGame
 
         private bool CheckStraightWindow(List<int> ranks, int numDeuces)
         {
-            // Max - Min must be < 5
-            // And duplicates already checked (no duplicates allowed for straight)
-            if (ranks.Max() - ranks.Min() >= 5) return false;
-            return true;
+            // We already ensure no duplicates. A straight is possible if the window width is < 5
+            // and the number of missing ranks is no more than the available wilds (deuces).
+            int min = ranks.Min();
+            int max = ranks.Max();
+            if (max - min >= 5) return false;
+
+            int needed = (max - min + 1) - ranks.Count; // gaps inside the window
+            return needed <= numDeuces;
         }
 
         private bool IsWildFourOfAKind(List<Card> nonDeuces, int deuces)
