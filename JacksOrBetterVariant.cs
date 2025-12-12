@@ -62,5 +62,22 @@ namespace PokerGame
         {
             return false;
         }
+
+        public List<PaytableRow> GetPaytable()
+        {
+            // Standard 9/6 Jacks or Better
+            return new List<PaytableRow>
+            {
+                new PaytableRow("Royal Flush", HandRank.RoyalFlush, new[] { 250, 500, 750, 1000, 4000 }),
+                new PaytableRow("Straight Flush", HandRank.StraightFlush, new[] { 50, 100, 150, 200, 250 }),
+                new PaytableRow("4 of a Kind", HandRank.FourOfAKind, new[] { 25, 50, 75, 100, 125 }),
+                new PaytableRow("Full House", HandRank.FullHouse, new[] { 9, 18, 27, 36, 45 }),
+                new PaytableRow("Flush", HandRank.Flush, new[] { 6, 12, 18, 24, 30 }),
+                new PaytableRow("Straight", HandRank.Straight, new[] { 4, 8, 12, 16, 20 }),
+                new PaytableRow("3 of a Kind", HandRank.ThreeOfAKind, new[] { 3, 6, 9, 12, 15 }),
+                new PaytableRow("Two Pair", HandRank.TwoPair, new[] { 2, 4, 6, 8, 10 }),
+                new PaytableRow("Jacks or Better", HandRank.JacksOrBetter, new[] { 1, 2, 3, 4, 5 })
+            };
+        }
     }
 }

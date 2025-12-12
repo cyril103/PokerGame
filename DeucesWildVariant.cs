@@ -304,5 +304,23 @@ namespace PokerGame
         {
             return card.Rank == Rank.Two;
         }
+
+        public List<PaytableRow> GetPaytable()
+        {
+            // NSUD Pay Table
+            return new List<PaytableRow>
+            {
+                new PaytableRow("Natural Royal Flush", HandRank.RoyalFlush, new[] { 250, 500, 750, 1000, 4000 }),
+                new PaytableRow("Four Deuces", HandRank.FourDeuces, new[] { 200, 400, 600, 800, 1000 }),
+                new PaytableRow("Wild Royal Flush", HandRank.WildRoyalFlush, new[] { 25, 50, 75, 100, 125 }),
+                new PaytableRow("Five of a Kind", HandRank.FiveOfAKind, new[] { 16, 32, 48, 64, 80 }),
+                new PaytableRow("Straight Flush", HandRank.StraightFlush, new[] { 10, 20, 30, 40, 50 }),
+                new PaytableRow("Four of a Kind", HandRank.FourOfAKind, new[] { 4, 8, 12, 16, 20 }),
+                new PaytableRow("Full House", HandRank.FullHouse, new[] { 4, 8, 12, 16, 20 }),
+                new PaytableRow("Flush", HandRank.Flush, new[] { 3, 6, 9, 12, 15 }),
+                new PaytableRow("Straight", HandRank.Straight, new[] { 2, 4, 6, 8, 10 }),
+                new PaytableRow("Three of a Kind", HandRank.ThreeOfAKind, new[] { 1, 2, 3, 4, 5 })
+            };
+        }
     }
 }

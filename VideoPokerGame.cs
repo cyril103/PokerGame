@@ -164,6 +164,11 @@ namespace PokerGame
             return _variant.IsCardWild(card);
         }
 
+        public List<PaytableRow> GetPaytable()
+        {
+            return _variant.GetPaytable();
+        }
+
         public void Reset()
         {
             CurrentState = GameState.WaitingForBet;

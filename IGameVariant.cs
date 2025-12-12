@@ -9,5 +9,6 @@ namespace PokerGame
         int CalculatePayout(HandRank rank, int bet);
         List<Card> GetWinningCards(List<Card> hand, HandRank rank);
         bool IsCardWild(Card card);
+        List<PaytableRow> GetPaytable();
     }
 }

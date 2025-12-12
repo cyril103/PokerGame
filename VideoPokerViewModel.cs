@@ -26,6 +26,13 @@ namespace PokerGame
         private bool _showCollectButton;
         private bool _isBetEnabled = true;
         private bool _isDealDrawEnabled = true;
+        private System.Collections.ObjectModel.ObservableCollection<PaytableRow> _currentPaytable;
+
+        public System.Collections.ObjectModel.ObservableCollection<PaytableRow> CurrentPaytable
+        {
+            get => _currentPaytable;
+            set => SetField(ref _currentPaytable, value);
+        }
 
         public VideoPokerViewModel(
             System.Action betOneAction,
@@ -118,6 +125,11 @@ namespace PokerGame
 
         public void UpdateFromGame(VideoPokerGame game, bool isAnimating)
         {
+            if (CurrentPaytable == null)
+            {
+                CurrentPaytable = new System.Collections.ObjectModel.ObservableCollection<PaytableRow>(game.GetPaytable());
+            }
+
             Credits = game.Credits;
 
             switch (game.CurrentState)
