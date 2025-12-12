@@ -102,7 +102,7 @@ namespace PokerGame
             if (LastWin <= 0)
                 throw new InvalidOperationException("Cannot double up now.");
 
-            if (CurrentState != GameState.GameOver && CurrentState != GameState.DoubleUp)
+            if (CurrentState != GameState.GameOver)
                 throw new InvalidOperationException("Double up not available.");
 
             PrepareDoubleUpRound();
@@ -120,8 +120,8 @@ namespace PokerGame
             Card dealerCard = CurrentHand[0];
             Card playerCard = CurrentHand[cardIndex];
 
-            // Compare
-            int comparison = playerCard.CompareTo(dealerCard);
+            // Compare ranks only for Double Up (suit should not decide outcome)
+            int comparison = playerCard.Rank.CompareTo(dealerCard.Rank);
             
             if (comparison > 0) // Player wins
             {
@@ -193,4 +193,3 @@ namespace PokerGame
         }
     }
 }
-

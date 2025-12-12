@@ -1,6 +1,3 @@
-using System.ComponentModel;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
@@ -150,7 +147,7 @@ namespace PokerGame
                     DealDrawLabel = "DRAW";
                     ShowBetControls = false;
                     ShowDealDrawButton = false;
-                    ShowDoubleButton = game.LastWin > 0 && !isAnimating; // allow double again / collect after result
+                    ShowDoubleButton = false; // During Double Up, player must pick a card, not restart the round
                     ShowCollectButton = game.LastWin > 0 && !isAnimating;
                     IsBetEnabled = false;
                     IsDealDrawEnabled = false;
