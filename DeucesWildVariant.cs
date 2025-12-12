@@ -186,15 +186,15 @@ namespace PokerGame
 
         public int CalculatePayout(HandRank rank, int bet)
         {
-            // Deuces Wild Pay Table (Common "Full Pay" or similar)
-            // Natural Royal: 250/800/4000
+            // "Not So Ugly Ducks" (NSUD) Pay Table - More generous than standard
+            // Natural Royal: 4000 (max bet) / 250
             // Four Deuces: 200
             // Wild Royal: 25
-            // 5 of a Kind: 15
-            // Straight Flush: 9
-            // 4 of a Kind: 5
-            // Full House: 3
-            // Flush: 2
+            // 5 of a Kind: 16
+            // Straight Flush: 10
+            // 4 of a Kind: 4
+            // Full House: 4
+            // Flush: 3
             // Straight: 2
             // 3 of a Kind: 1
             
@@ -212,19 +212,19 @@ namespace PokerGame
                     multiplier = 25;
                     break;
                 case HandRank.FiveOfAKind:
-                    multiplier = 15;
+                    multiplier = 16;
                     break;
                 case HandRank.StraightFlush:
-                    multiplier = 9;
+                    multiplier = 10;
                     break;
                 case HandRank.FourOfAKind:
-                    multiplier = 5;
+                    multiplier = 4;
                     break;
                 case HandRank.FullHouse:
-                    multiplier = 3;
+                    multiplier = 4;
                     break;
                 case HandRank.Flush:
-                    multiplier = 2;
+                    multiplier = 3;
                     break;
                 case HandRank.Straight:
                     multiplier = 2;
@@ -241,40 +241,63 @@ namespace PokerGame
 
         public List<Card> GetWinningCards(List<Card> hand, HandRank rank)
         {
-            // In Deuces Wild, usually all cards are involved or we just highlight all?
-            // Or we highlight the combo.
-            // For simplicity, let's return all cards if it's a winning hand, 
-            // because with Wilds it's often ambiguous or complex to pick exactly which ones (e.g. 5 of a kind uses all).
-            // 3 of a kind uses 3.
-            
             if (rank == HandRank.HighCard) return new List<Card>();
 
-            // If it's a winning hand in Deuces Wild, often the whole hand is "good" or at least the wilds + combo.
-            // Let's try to be specific if possible, but returning all is a safe fallback for "You Won".
-            
-            // Specific logic:
+            // For Straight, Flush, Full House, Straight Flush, Royal Flush, Five of a Kind
+            // All 5 cards are involved.
+            if (rank == HandRank.Straight || 
+                rank == HandRank.Flush || 
+                rank == HandRank.FullHouse || 
+                rank == HandRank.StraightFlush || 
+                rank == HandRank.WildRoyalFlush || 
+                rank == HandRank.RoyalFlush || 
+                rank == HandRank.FiveOfAKind ||
+                rank == HandRank.FourDeuces) // 4 Deuces + Kicker is usually considered 5 cards winning or just 4? 
+                                             // Usually the kicker doesn't matter, but highlighting 4 is cleaner.
+            {
+                if (rank == HandRank.FourDeuces)
+                {
+                    return hand.Where(c => c.Rank == Rank.Two).ToList();
+                }
+                return hand;
+            }
+
             var deuces = hand.Where(c => c.Rank == Rank.Two).ToList();
             var nonDeuces = hand.Where(c => c.Rank != Rank.Two).ToList();
 
-            if (rank == HandRank.ThreeOfAKind)
+            if (rank == HandRank.FourOfAKind)
             {
-                // Find the rank that makes 3 of a kind
+                // 4 of a Kind: Deuces + matching non-deuces.
+                // We need to find which rank forms the quad.
+                // It's the rank with the most count among non-deuces.
                 var group = nonDeuces.GroupBy(c => c.Rank).OrderByDescending(g => g.Count()).FirstOrDefault();
                 if (group != null)
                 {
                     var winning = new List<Card>(deuces);
                     winning.AddRange(group);
-                    // If we have more than needed? (e.g. 2 deuces + 1 card = 3. Hand has 5 cards).
-                    // We need exactly 3 cards total?
-                    // If we have 2 deuces and 3 random cards. 2 deuces + 1 random = 3 of a kind.
-                    // Which random? Highest?
-                    // Let's just return all cards for now to avoid visual confusion.
-                    // Or better: return the cards that form the hand.
-                    return hand; // Placeholder: highlighting all winning cards is acceptable for Deuces Wild.
+                    return winning;
                 }
             }
 
-            return hand;
+            if (rank == HandRank.ThreeOfAKind)
+            {
+                // 3 of a Kind: Deuces + matching non-deuces.
+                var group = nonDeuces.GroupBy(c => c.Rank).OrderByDescending(g => g.Count()).FirstOrDefault();
+                if (group != null)
+                {
+                    var winning = new List<Card>(deuces);
+                    // We only need enough cards to make 3.
+                    // If we have 2 deuces, we need 1 from group.
+                    // If we have 1 deuce, we need 2 from group.
+                    // If we have 0 deuces, we need 3 from group.
+                    
+                    int needed = 3 - deuces.Count;
+                    winning.AddRange(group.Take(needed));
+                    return winning;
+                }
+            }
+
+            return hand; // Fallback
         }
     }
 }

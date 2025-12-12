@@ -27,7 +27,7 @@
         </Grid.RenderTransform>
 
         <!-- Card Back -->
-        <Border x:Name="CardBack" Background="#003366" CornerRadius="12" BorderBrush="White" BorderThickness="3" Visibility="Collapsed">
+        <Border x:Name="CardBack" Background="#003366" CornerRadius="12" BorderBrush="White" BorderThickness="3" Visibility="Visible">
             <Grid>
                 <Rectangle Fill="Transparent"/> <!-- Hit test -->
                 <TextBlock Text="QVP" Foreground="#6699CC" HorizontalAlignment="Center" VerticalAlignment="Center" FontWeight="Bold" FontSize="40" Opacity="0.5">
@@ -40,7 +40,7 @@
         </Border>
 
         <!-- Card Front -->
-        <Border x:Name="CardFront" Background="White" CornerRadius="12" BorderBrush="Black" BorderThickness="1">
+        <Border x:Name="CardFront" Background="White" CornerRadius="12" BorderBrush="Black" BorderThickness="1" Visibility="Collapsed">
             <Border.Effect>
                 <DropShadowEffect Color="Black" BlurRadius="5" ShadowDepth="2" Opacity="0.3"/>
             </Border.Effect>
