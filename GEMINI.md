@@ -23,15 +23,15 @@ Application WPF (.NET 8) de Video Poker multi-variantes ("Jacks or Better" et "D
 ## État actuel
 - **Variantes** : Jacks or Better (9/6) et Deuces Wild (NSUD).
 - **Navigation** : Écran d'accueil pour choisir le jeu, bouton "MENU" en jeu pour revenir.
-- **Gameplay** : Double Up, Auto-Hold (à implémenter plus intelligemment), mise 1-5 crédits.
+- **Gameplay** : Double Up fiabilisé (comparaison sur le rang uniquement, tie = push, reroll bloqué pendant la manche), Auto-Hold (à implémenter plus intelligemment), mise 1-5 crédits.
 - **Visuel** : Animations de distribution, retournement des cartes, surbrillance précise des cartes gagnantes.
-- **Tests** : Couverture xUnit pour les deux variantes (`PokerGame.Tests`).
+- **Tests** : Couverture xUnit pour les deux variantes et pour les scénarios Double Up (win/push/lose, garde anti-reroll).
 
 ## Points techniques récents
 - **Refactoring Polymorphique** : Introduction de `IGameVariant` pour supporter plusieurs jeux sans dupliquer le moteur.
 - **Navigation MVVM** : Mise en place de `ShellViewModel` pour passer du menu au jeu sans redémarrer.
 - **Deuces Wild** : Implémentation complète avec gestion des 2 comme Wilds, nouvelles mains (Four Deuces, Wild Royal) et paytable ajustée.
-- **Correctifs** : Affichage initial des dos de cartes, correction du bug de redémarrage (réinitialisation des contrôles).
+- **Correctifs** : Affichage initial des dos de cartes, correction du bug de redémarrage (réinitialisation des contrôles), Double Up sécurisé (pas de reroll, tie correctement gérée).
 
 ## Backlog priorisé
 1) **Statistiques** : Fenêtre dédiée (mains jouées, win rate, RTP par variante).
@@ -43,4 +43,3 @@ Application WPF (.NET 8) de Video Poker multi-variantes ("Jacks or Better" et "D
 ## Comment lancer
 - `dotnet run` depuis la racine.
 - `dotnet test` pour lancer la suite de tests (incluant les règles Deuces Wild).
-

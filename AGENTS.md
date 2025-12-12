@@ -30,6 +30,8 @@ The project uses a clean MVVM architecture with a `ShellViewModel` managing navi
 - **Navigation**: `ShellViewModel` switches the `CurrentViewModel`. `MainWindow` renders the appropriate view using DataTemplates.
 - **Deuces Wild**: Special logic for Wild Cards (2s), new hand ranks (Four Deuces, Wild Royal), and specific winning card highlighting.
 - **Persistence**: Saves to `%LocalAppData%/PokerGame/savegame.json`. Auto-top-up if credits run out.
+- **Double Up**: Outcome now compares card ranks only (suit no longer breaks ties), and a Double Up round cannot be restarted mid-round; UI hides the Double button during Double Up.
+- **Testing**: xUnit suite covers variants plus Double Up win/push/lose and state guards.
 
 ## Current Backlog & Next Steps
 1.  **Statistics**: Add a stats view (Win rate, Hands played, etc.).
@@ -41,4 +43,3 @@ The project uses a clean MVVM architecture with a `ShellViewModel` managing navi
 ## How to Run
 - `dotnet run` in the project directory.
 - `dotnet test` to run the xUnit test suite.
-
