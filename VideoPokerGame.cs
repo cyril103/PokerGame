@@ -16,6 +16,7 @@ namespace PokerGame
     {
         private readonly Deck _deck;
         private readonly Bankroll _bankroll;
+        private readonly IGameVariant _variant;
         
         public List<Card> CurrentHand { get; private set; }
         public List<bool> HeldCards { get; private set; }
@@ -25,9 +26,11 @@ namespace PokerGame
         public HandRank LastHandRank { get; private set; }
 
         public int Credits => _bankroll.Credits;
+        public string VariantName => _variant.Name;
 
-        public VideoPokerGame(int initialCredits = 100)
+        public VideoPokerGame(IGameVariant variant, int initialCredits = 100)
         {
+            _variant = variant ?? throw new ArgumentNullException(nameof(variant));
             _bankroll = new Bankroll(initialCredits);
             _deck = new Deck();
             CurrentState = GameState.WaitingForBet;
@@ -86,9 +89,9 @@ namespace PokerGame
 
             _deck.ReplaceCards(CurrentHand, cardsToReplace);
             
-            // Evaluate
-            LastHandRank = HandEvaluator.EvaluateHand(CurrentHand);
-            LastWin = CalculatePayout(LastHandRank, CurrentBet);
+            // Evaluate using the variant
+            LastHandRank = _variant.EvaluateHand(CurrentHand);
+            LastWin = _variant.CalculatePayout(LastHandRank, CurrentBet);
             _bankroll.AddWin(LastWin);
 
             CurrentState = GameState.GameOver;
@@ -151,48 +154,9 @@ namespace PokerGame
             // Money is already in bankroll from Draw() or PlayDoubleUp() updates.
         }
 
-        private int CalculatePayout(HandRank rank, int bet)
+        public List<Card> GetWinningCards()
         {
-            // Standard 9/6 Jacks or Better Pay Table
-            int multiplier = 0;
-            switch (rank)
-            {
-                case HandRank.RoyalFlush:
-                    // Bonus for max bet (5 coins) is usually 4000, but we'll keep it linear 800x or 250x depending on rules.
-                    // Standard machine: 250x for 1-4 coins, 800x for 5 coins.
-                    // Let's implement the big bonus for 5 coins.
-                    if (bet == 5) return 4000; 
-                    multiplier = 250;
-                    break;
-                case HandRank.StraightFlush:
-                    multiplier = 50;
-                    break;
-                case HandRank.FourOfAKind:
-                    multiplier = 25;
-                    break;
-                case HandRank.FullHouse:
-                    multiplier = 9;
-                    break;
-                case HandRank.Flush:
-                    multiplier = 6;
-                    break;
-                case HandRank.Straight:
-                    multiplier = 4;
-                    break;
-                case HandRank.ThreeOfAKind:
-                    multiplier = 3;
-                    break;
-                case HandRank.TwoPair:
-                    multiplier = 2;
-                    break;
-                case HandRank.JacksOrBetter:
-                    multiplier = 1;
-                    break;
-                default:
-                    multiplier = 0;
-                    break;
-            }
-            return bet * multiplier;
+            return _variant.GetWinningCards(CurrentHand, LastHandRank);
         }
 
         public void Reset()
@@ -219,3 +183,4 @@ namespace PokerGame
         }
     }
 }
+

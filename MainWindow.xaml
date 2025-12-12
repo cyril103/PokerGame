@@ -71,92 +71,107 @@
             </Setter>
             <Setter Property="FontSize" Value="24"/>
         </Style>
+
+        <DataTemplate DataType="{x:Type local:GameSelectionViewModel}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                
+                <StackPanel Grid.Row="0" HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,50">
+                    <TextBlock Text="QUANTUM VIDEO POKER" Foreground="#FFD700" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center">
+                        <TextBlock.Effect>
+                            <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="5"/>
+                        </TextBlock.Effect>
+                    </TextBlock>
+                    <TextBlock Text="Select Game Variant" FontSize="32" Foreground="White" HorizontalAlignment="Center" Margin="0,20,0,0"/>
+                </StackPanel>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" >
+                    <Button Content="Jacks or Better" Command="{Binding SelectJacksOrBetterCommand}" Width="250" Height="80" FontSize="24" Margin="20"/>
+                    <Button Content="Deuces Wild" Command="{Binding SelectDeucesWildCommand}" Width="250" Height="80" FontSize="24" Margin="20"/>
+                </StackPanel>
+            </Grid>
+        </DataTemplate>
+
+        <DataTemplate DataType="{x:Type local:VideoPokerViewModel}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Header / Status -->
+                <Border Background="#222" Padding="10">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="CREDITS: " Foreground="White" FontSize="20" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding Credits}" Foreground="#FFD700" FontSize="20" FontWeight="Bold"/>
+                        </StackPanel>
+
+                        <TextBlock Grid.Column="1" Text="{Binding StatusText}" Foreground="{Binding StatusBrush}" 
+                                   FontSize="24" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+
+                        <StackPanel Grid.Column="2" Orientation="Horizontal">
+                            <TextBlock Text="BET: " Foreground="White" FontSize="20" FontWeight="Bold"/>
+                            <TextBlock Text="{Binding SelectedBet}" Foreground="#FFD700" FontSize="20" FontWeight="Bold"/>
+                        </StackPanel>
+                    </Grid>
+                </Border>
+
+                <!-- Cards Area -->
+                <Grid Grid.Row="1" Margin="20" VerticalAlignment="Center">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <local:CardControl x:Name="Card1" Grid.Column="0" Margin="5" MouseDown="Card_MouseDown"/>
+                    <local:CardControl x:Name="Card2" Grid.Column="1" Margin="5" MouseDown="Card_MouseDown"/>
+                    <local:CardControl x:Name="Card3" Grid.Column="2" Margin="5" MouseDown="Card_MouseDown"/>
+                    <local:CardControl x:Name="Card4" Grid.Column="3" Margin="5" MouseDown="Card_MouseDown"/>
+                    <local:CardControl x:Name="Card5" Grid.Column="4" Margin="5" MouseDown="Card_MouseDown"/>
+                </Grid>
+
+                <!-- Controls -->
+                <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,20">
+                    <Button Content="BET ONE" Command="{Binding BetOneCommand}" Width="100" Height="50" Margin="10" 
+                            Visibility="{Binding ShowBetControls, Converter={StaticResource BoolToVis}}"/>
+                    <Button Content="BET MAX" Command="{Binding BetMaxCommand}" Width="100" Height="50" Margin="10" 
+                            Visibility="{Binding ShowBetControls, Converter={StaticResource BoolToVis}}"/>
+                    
+                    <Button Content="{Binding DealDrawLabel}" Command="{Binding DealDrawCommand}" Width="120" Height="60" Margin="20,0" 
+                            FontWeight="Bold" FontSize="18" Background="#4CAF50" Foreground="White"
+                            Visibility="{Binding ShowDealDrawButton, Converter={StaticResource BoolToVis}}"/>
+
+                    <Button Content="DOUBLE UP" Command="{Binding DoubleCommand}" Width="120" Height="60" Margin="20,0" 
+                            FontWeight="Bold" FontSize="18" Background="#FF9800" Foreground="White"
+                            Visibility="{Binding ShowDoubleButton, Converter={StaticResource BoolToVis}}"/>
+                    
+                    <Button Content="COLLECT" Command="{Binding CollectCommand}" Width="120" Height="60" Margin="20,0" 
+                            FontWeight="Bold" FontSize="18" Background="#2196F3" Foreground="White"
+                            Visibility="{Binding ShowCollectButton, Converter={StaticResource BoolToVis}}"/>
+                </StackPanel>
+                
+                <!-- Paytable (Simplified) -->
+                <TextBlock Grid.Row="3" Text="Pays according to variant rules" Foreground="Gray" HorizontalAlignment="Center" Margin="5"/>
+            </Grid>
+        </DataTemplate>
     </Window.Resources>
 
     <Grid>
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/> <!-- Header -->
-            <RowDefinition Height="*"/>    <!-- Cards -->
-            <RowDefinition Height="Auto"/> <!-- Controls -->
-        </Grid.RowDefinitions>
-
-        <!-- Header -->
-        <StackPanel Grid.Row="0" HorizontalAlignment="Center" Margin="20">
-            <TextBlock Text="QUANTUM VIDEO POKER" Foreground="#FFD700" FontSize="48" FontWeight="Bold" HorizontalAlignment="Center">
-                <TextBlock.Effect>
-                    <DropShadowEffect Color="Black" BlurRadius="15" ShadowDepth="5"/>
-                </TextBlock.Effect>
-            </TextBlock>
-            <Border Background="#88000000" CornerRadius="10" Padding="20,5" Margin="0,10,0,0" HorizontalAlignment="Center">
-                <TextBlock x:Name="StatusText" Text="{Binding StatusText}" Foreground="{Binding StatusBrush}" FontSize="28" HorizontalAlignment="Center" FontWeight="SemiBold"/>
-            </Border>
-        </StackPanel>
-
-        <!-- Cards Area -->
-        <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-            <local:CardControl x:Name="Card1" Margin="15" MouseDown="Card_MouseDown"/>
-            <local:CardControl x:Name="Card2" Margin="15" MouseDown="Card_MouseDown"/>
-            <local:CardControl x:Name="Card3" Margin="15" MouseDown="Card_MouseDown"/>
-            <local:CardControl x:Name="Card4" Margin="15" MouseDown="Card_MouseDown"/>
-            <local:CardControl x:Name="Card5" Margin="15" MouseDown="Card_MouseDown"/>
-        </StackPanel>
-
-        <!-- Controls & Info -->
-        <Border Grid.Row="2" Background="#CC000000" Padding="20" BorderBrush="#FFD700" BorderThickness="0,2,0,0">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-
-                <!-- Left: Info -->
-                <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="20,0">
-                    <TextBlock Text="CREDITS" Foreground="#AAAAAA" FontSize="16"/>
-                    <TextBlock x:Name="CreditsText" Text="{Binding Credits}" Foreground="#00FF00" FontSize="40" FontWeight="Bold">
-                        <TextBlock.Effect>
-                            <DropShadowEffect Color="#00FF00" BlurRadius="10" ShadowDepth="0"/>
-                        </TextBlock.Effect>
-                    </TextBlock>
-                </StackPanel>
-
-                <!-- Center: Action Buttons -->
-                <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button x:Name="BtnBetOne" Content="BET ONE" Width="120" Height="60" Margin="10"
-                            Command="{Binding BetOneCommand}"
-                            IsEnabled="{Binding IsBetEnabled}"
-                            Visibility="{Binding ShowBetControls, Converter={StaticResource BoolToVis}}"/>
-                    <Button x:Name="BtnBetMax" Content="BET MAX" Width="120" Height="60" Margin="10"
-                            Command="{Binding BetMaxCommand}"
-                            IsEnabled="{Binding IsBetEnabled}"
-                            Visibility="{Binding ShowBetControls, Converter={StaticResource BoolToVis}}"/>
-                    <Button x:Name="BtnDealDraw" Content="{Binding DealDrawLabel}" Width="160" Height="70" Margin="30,0"
-                            Command="{Binding DealDrawCommand}"
-                            IsEnabled="{Binding IsDealDrawEnabled}"
-                            Visibility="{Binding ShowDealDrawButton, Converter={StaticResource BoolToVis}}"
-                            Style="{StaticResource ActionButtonStyle}"/>
-                    
-                    <!-- Double Up Controls -->
-                    <Button x:Name="BtnDouble" Content="DOUBLE" Width="120" Height="60" Margin="10"
-                            Command="{Binding DoubleCommand}"
-                            Visibility="{Binding ShowDoubleButton, Converter={StaticResource BoolToVis}}"
-                            Background="#FF4500"/>
-                    <Button x:Name="BtnCollect" Content="COLLECT" Width="120" Height="60" Margin="10"
-                            Command="{Binding CollectCommand}"
-                            Visibility="{Binding ShowCollectButton, Converter={StaticResource BoolToVis}}"
-                            Background="#228B22"/>
-                </StackPanel>
-
-                <!-- Right: Bet Info -->
-                <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="20,0">
-                    <TextBlock Text="BET" Foreground="#AAAAAA" FontSize="16" HorizontalAlignment="Right"/>
-                    <TextBlock x:Name="BetText" Text="{Binding SelectedBet}" Foreground="Yellow" FontSize="40" FontWeight="Bold" HorizontalAlignment="Right">
-                         <TextBlock.Effect>
-                            <DropShadowEffect Color="Yellow" BlurRadius="10" ShadowDepth="0"/>
-                        </TextBlock.Effect>
-                    </TextBlock>
-                </StackPanel>
-            </Grid>
-        </Border>
+        <ContentControl Content="{Binding CurrentViewModel}" />
     </Grid>
 </Window>

@@ -15,7 +15,11 @@ namespace PokerGame
         FullHouse,
         FourOfAKind,
         StraightFlush,
-        RoyalFlush
+        RoyalFlush,
+        // Deuces Wild specific
+        FiveOfAKind,
+        WildRoyalFlush,
+        FourDeuces
     }
 
     public class HandEvaluator

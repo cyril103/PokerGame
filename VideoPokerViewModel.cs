@@ -1,11 +1,12 @@
 using System.ComponentModel;
+using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows.Media;
 
 namespace PokerGame
 {
-    public class MainViewModel : INotifyPropertyChanged
+    public class VideoPokerViewModel : ViewModelBase
     {
         private readonly RelayCommand _betOneCommand;
         private readonly RelayCommand _betMaxCommand;
@@ -25,7 +26,7 @@ namespace PokerGame
         private bool _isBetEnabled = true;
         private bool _isDealDrawEnabled = true;
 
-        public MainViewModel(
+        public VideoPokerViewModel(
             System.Action betOneAction,
             System.Action betMaxAction,
             System.Func<Task> dealDrawAction,
@@ -186,8 +187,6 @@ namespace PokerGame
             }
         }
 
-        public event PropertyChangedEventHandler? PropertyChanged;
-
         private void RaiseCommandCanExecute()
         {
             _betOneCommand.RaiseCanExecuteChanged();
@@ -195,13 +194,6 @@ namespace PokerGame
             _dealDrawCommand.RaiseCanExecuteChanged();
             _doubleCommand.RaiseCanExecuteChanged();
             _collectCommand.RaiseCanExecuteChanged();
-        }
-
-        private void SetField<T>(ref T field, T value, [CallerMemberName] string? propertyName = null)
-        {
-            if (Equals(field, value)) return;
-            field = value;
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
