@@ -7,8 +7,8 @@ namespace PokerGame
     {
         private readonly RelayCommand _betOneCommand;
         private readonly RelayCommand _betMaxCommand;
-        private readonly RelayCommand _dealDrawCommand;
-        private readonly RelayCommand _doubleCommand;
+        private readonly AsyncRelayCommand _dealDrawCommand;
+        private readonly AsyncRelayCommand _doubleCommand;
         private readonly RelayCommand _collectCommand;
         private readonly RelayCommand _returnToMenuCommand;
 
@@ -41,8 +41,8 @@ namespace PokerGame
         {
             _betOneCommand = new RelayCommand(_ => betOneAction(), _ => IsBetEnabled);
             _betMaxCommand = new RelayCommand(_ => betMaxAction(), _ => IsBetEnabled);
-            _dealDrawCommand = new RelayCommand(async _ => await dealDrawAction(), _ => IsDealDrawEnabled && ShowDealDrawButton);
-            _doubleCommand = new RelayCommand(async _ => await doubleAction(), _ => ShowDoubleButton);
+            _dealDrawCommand = new AsyncRelayCommand(dealDrawAction, () => IsDealDrawEnabled && ShowDealDrawButton);
+            _doubleCommand = new AsyncRelayCommand(doubleAction, () => ShowDoubleButton);
             _collectCommand = new RelayCommand(_ => collectAction(), _ => ShowCollectButton);
             _returnToMenuCommand = new RelayCommand(_ => returnToMenuAction());
         }
@@ -113,12 +113,12 @@ namespace PokerGame
             set => SetField(ref _isDealDrawEnabled, value);
         }
 
-        public RelayCommand BetOneCommand => _betOneCommand;
-        public RelayCommand BetMaxCommand => _betMaxCommand;
-        public RelayCommand DealDrawCommand => _dealDrawCommand;
-        public RelayCommand DoubleCommand => _doubleCommand;
-        public RelayCommand CollectCommand => _collectCommand;
-        public RelayCommand ReturnToMenuCommand => _returnToMenuCommand;
+        public System.Windows.Input.ICommand BetOneCommand => _betOneCommand;
+        public System.Windows.Input.ICommand BetMaxCommand => _betMaxCommand;
+        public System.Windows.Input.ICommand DealDrawCommand => _dealDrawCommand;
+        public System.Windows.Input.ICommand DoubleCommand => _doubleCommand;
+        public System.Windows.Input.ICommand CollectCommand => _collectCommand;
+        public System.Windows.Input.ICommand ReturnToMenuCommand => _returnToMenuCommand;
 
         public void UpdateFromGame(VideoPokerGame game, bool isAnimating)
         {
@@ -148,7 +148,7 @@ namespace PokerGame
                     ShowBetControls = false;
                     ShowDealDrawButton = false;
                     ShowDoubleButton = false; // During Double Up, player must pick a card, not restart the round
-                    ShowCollectButton = game.LastWin > 0 && !isAnimating;
+                    ShowCollectButton = false; // Prevent collecting before choosing a card in Double Up
                     IsBetEnabled = false;
                     IsDealDrawEnabled = false;
                     StatusText = "Pick a card higher than the Dealer's (Left)";
