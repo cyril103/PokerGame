@@ -5,6 +5,7 @@ A feature-rich Video Poker application built with C# and WPF (.NET 8.0).
 - **Multiple Game Variants**:
   - **Jacks or Better**: Classic 9/6 paytable.
   - **Deuces Wild**: "Not So Ugly Ducks" (NSUD) paytable with Wild Twos.
+  - **Double Double Bonus**: 9/6 paytable with high payouts for specific Four of a Kind hands and kickers.
 - **Double Up**: Risk your winnings in a "High Card" mini-game.
 - **Persistent Bankroll**: Credits are saved between sessions.
 - **Sound & Visuals**: Card animations, winning hand highlights, and sound effects.
