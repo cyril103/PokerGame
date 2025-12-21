@@ -36,7 +36,7 @@ namespace PokerGame
 
             // Animate Close
             var tcs = new TaskCompletionSource<bool>();
-            EventHandler handler = null;
+            EventHandler? handler = null;
             handler = (s, e) => 
             {
                 close.Completed -= handler;

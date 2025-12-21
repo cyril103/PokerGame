@@ -10,13 +10,13 @@ namespace PokerGame
 {
     public partial class MainWindow : Window
     {
-        private VideoPokerGame _game;
-        private List<CardControl> _cardControls;
+        private VideoPokerGame? _game;
+        private List<CardControl> _cardControls = new();
         private bool _isAnimating = false;
-        private SoundManager _soundManager;
-        private PersistenceManager _persistenceManager;
-        private ShellViewModel _shellViewModel;
-        private VideoPokerViewModel _gameViewModel;
+        private SoundManager _soundManager = null!;
+        private PersistenceManager _persistenceManager = null!;
+        private ShellViewModel _shellViewModel = null!;
+        private VideoPokerViewModel? _gameViewModel;
 
         public MainWindow()
         {
@@ -46,7 +46,7 @@ namespace PokerGame
         {
             var saveData = _persistenceManager.Load();
             _game = new VideoPokerGame(variant, saveData.Credits);
-            _cardControls = null; // Force re-discovery of controls for the new view
+            _cardControls = new List<CardControl>(); // Force re-discovery of controls for the new view
             
             // Re-initialize card controls list when the view is loaded?
             // The CardControls are inside the DataTemplate, so they are not accessible via 'this.Card1' anymore.
@@ -67,7 +67,7 @@ namespace PokerGame
             _shellViewModel.NavigateTo(_gameViewModel);
         }
 
-        private void MainWindow_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
         {
             if (_game != null)
             {
@@ -110,11 +110,11 @@ namespace PokerGame
         
         private void EnsureCardControls()
         {
-             if (_cardControls == null || _cardControls.Count != 5)
-             {
-                 _cardControls = new List<CardControl>();
-                 // Find Card1..Card5 in the visual tree
-                 // This is a bit hacky but works for this refactor.
+            if (_cardControls.Count != 5)
+            {
+                _cardControls = new List<CardControl>();
+                // Find Card1..Card5 in the visual tree
+                // This is a bit hacky but works for this refactor.
                  // Better: Use a UserControl for GameView and expose the cards.
                  
                  var contentPresenter = FindVisualChild<ContentPresenter>(this);
@@ -137,6 +137,7 @@ namespace PokerGame
 
         private void BetOneAction()
         {
+            if (_game == null || _gameViewModel == null) return;
             if (_game.CurrentState == GameState.WaitingForBet && !_isAnimating)
             {
                 _soundManager.PlayClick();
@@ -152,6 +153,7 @@ namespace PokerGame
 
         private void BetMaxAction()
         {
+            if (_game == null || _gameViewModel == null) return;
             if (_game.CurrentState == GameState.WaitingForBet && !_isAnimating)
             {
                 _soundManager.PlayClick();
@@ -163,7 +165,7 @@ namespace PokerGame
 
         private async Task DealDrawAsync()
         {
-            if (_isAnimating) return;
+            if (_isAnimating || _game == null || _gameViewModel == null) return;
             EnsureCardControls();
             if (_cardControls.Count < 5) return; // View not ready?
 
@@ -263,7 +265,7 @@ namespace PokerGame
 
         private async Task DoubleAsync()
         {
-            if (_isAnimating) return;
+            if (_isAnimating || _game == null) return;
             _isAnimating = true;
             EnsureCardControls();
             try
@@ -296,7 +298,7 @@ namespace PokerGame
 
         private void CollectAction()
         {
-             if (_isAnimating) return;
+             if (_isAnimating || _game == null) return;
              try
              {
                  _soundManager.PlayClick();
@@ -311,7 +313,7 @@ namespace PokerGame
 
         private async void Card_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            if (_isAnimating) return;
+            if (_isAnimating || _game == null) return;
             EnsureCardControls();
 
             if (_game.CurrentState == GameState.Dealt)
@@ -327,7 +329,7 @@ namespace PokerGame
                     }
                 }
             }
-            else if (_game.CurrentState == GameState.DoubleUp)
+            else if (_game.CurrentState == GameState.DoubleUp && _gameViewModel != null)
             {
                 if (sender is CardControl cardControl)
                 {
@@ -372,7 +374,7 @@ namespace PokerGame
         }
 
         // Helper methods to find children in Visual Tree
-        private T FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
+        private T? FindVisualChild<T>(DependencyObject parent) where T : DependencyObject
         {
             for (int i = 0; i < VisualTreeHelper.GetChildrenCount(parent); i++)
             {
@@ -384,10 +386,10 @@ namespace PokerGame
             return null;
         }
 
-        private T FindChild<T>(DependencyObject parent, string childName) where T : DependencyObject
+        private T? FindChild<T>(DependencyObject parent, string childName) where T : DependencyObject
         {
             if (parent == null) return null;
-            T foundChild = null;
+            T? foundChild = null;
             int childrenCount = VisualTreeHelper.GetChildrenCount(parent);
             for (int i = 0; i < childrenCount; i++)
             {

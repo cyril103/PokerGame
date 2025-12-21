@@ -23,9 +23,9 @@ namespace PokerGame
         private bool _showCollectButton;
         private bool _isBetEnabled = true;
         private bool _isDealDrawEnabled = true;
-        private System.Collections.ObjectModel.ObservableCollection<PaytableRow> _currentPaytable;
+        private System.Collections.ObjectModel.ObservableCollection<PaytableRow>? _currentPaytable;
 
-        public System.Collections.ObjectModel.ObservableCollection<PaytableRow> CurrentPaytable
+        public System.Collections.ObjectModel.ObservableCollection<PaytableRow>? CurrentPaytable
         {
             get => _currentPaytable;
             set => SetField(ref _currentPaytable, value);

@@ -4,8 +4,8 @@ namespace PokerGame
 {
     public class ShellViewModel : ViewModelBase
     {
-        private ViewModelBase _currentViewModel;
-        private readonly System.Action _onExitGame;
+        private ViewModelBase _currentViewModel = null!;
+        private readonly System.Action? _onExitGame;
 
         public ViewModelBase CurrentViewModel
         {
@@ -15,9 +15,9 @@ namespace PokerGame
 
         public ICommand ReturnToMenuCommand { get; }
 
-        public ShellViewModel(ViewModelBase initialViewModel, System.Action onExitGame = null)
+        public ShellViewModel(ViewModelBase initialViewModel, System.Action? onExitGame = null)
         {
-            CurrentViewModel = initialViewModel;
+            CurrentViewModel = initialViewModel ?? throw new System.ArgumentNullException(nameof(initialViewModel));
             _onExitGame = onExitGame;
             ReturnToMenuCommand = new RelayCommand(_ => ReturnToMenu());
         }
