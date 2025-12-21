@@ -177,7 +177,8 @@ namespace PokerGame
                     IsDealDrawEnabled = !isAnimating;
                     if (game.LastWin > 0)
                     {
-                        StatusText = $"{game.LastHandRank} - YOU WIN {game.LastWin}!";
+                        string rankName = FormatHandRank(game.LastHandRank);
+                        StatusText = $"{rankName} - YOU WIN {game.LastWin}!";
                         StatusBrush = Brushes.Yellow;
                     }
                     else
@@ -198,6 +199,22 @@ namespace PokerGame
             {
                 StatusBrush = brush;
             }
+        }
+
+        private string FormatHandRank(HandRank rank)
+        {
+            // Simple formatting: add spaces before capital letters
+            string name = rank.ToString();
+            var sb = new System.Text.StringBuilder();
+            for (int i = 0; i < name.Length; i++)
+            {
+                if (i > 0 && char.IsUpper(name[i]))
+                {
+                    sb.Append(' ');
+                }
+                sb.Append(name[i]);
+            }
+            return sb.ToString();
         }
 
         private void RaiseCommandCanExecute()

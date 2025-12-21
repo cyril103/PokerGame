@@ -92,6 +92,7 @@
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center" >
                     <Button Content="Jacks or Better" Command="{Binding SelectJacksOrBetterCommand}" Width="250" Height="80" FontSize="24" Margin="20"/>
                     <Button Content="Deuces Wild" Command="{Binding SelectDeucesWildCommand}" Width="250" Height="80" FontSize="24" Margin="20"/>
+                    <Button Content="Double Double Bonus" Command="{Binding SelectDoubleDoubleBonusCommand}" Width="250" Height="80" FontSize="20" Margin="20"/>
                     <Button Content="QUIT" Command="{Binding QuitCommand}" Width="150" Height="80" FontSize="24" Margin="20" Background="#AA3333"/>
                 </StackPanel>
             </Grid>

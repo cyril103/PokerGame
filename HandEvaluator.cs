@@ -19,7 +19,13 @@ namespace PokerGame
         // Deuces Wild specific
         FiveOfAKind,
         WildRoyalFlush,
-        FourDeuces
+        FourDeuces,
+        // Double Double Bonus specific
+        FourAcesWithKicker,
+        FourAces,
+        FourTwosThreesFoursWithKicker,
+        FourTwosThreesFours,
+        FourFivesThroughKings
     }
 
     public class HandEvaluator
